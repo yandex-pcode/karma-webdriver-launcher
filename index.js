@@ -80,7 +80,23 @@ var WebDriverInstance = function (baseBrowserDecorator, args, logger) {
     log.debug('Browser capabilities: ' + JSON.stringify(spec));
 
     self.driver = wd.remote(config, 'promiseChain');
-    self.browser = self.driver.init(spec);
+    self.browser = self.driver.init(spec, function (err, sessionID, capabilities) {
+      if (err) {
+        log.info('Driver error: ' + err);
+      } else {
+        log.debug('Driver inited with session ' + sessionID + ' and ' + capabilities + ' capabilities');
+      }
+    });
+
+    self.driver.on('status', function(info) {
+      log.debug('Driver status: ' + info);
+    });
+    self.driver.on('command', function(eventType, command, response) {
+      log.debug('Driver command: ' + eventType + ' ' + command + ' ' + (response || ''));
+    });
+    self.driver.on('http', function(meth, path, data) {
+      log.debug('Driver HTTP: ' + meth + ' ' + path + ' ' + (data || ''));
+    });
 
     var interval = args.pseudoActivityInterval && setInterval(function() {
       log.debug('Imitate activity');
