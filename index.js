@@ -80,6 +80,7 @@ var WebDriverInstance = function (baseBrowserDecorator, args, logger) {
     log.debug('Browser capabilities: ' + JSON.stringify(spec));
 
     self.driver = wd.remote(config, 'promiseChain');
+    log.debug('WebDriver sessionID: ' + self.driver.getSessionID());
     self.browser = self.driver.init(spec, function (err, sessionID, capabilities) {
       if (err) {
         log.info('Driver error: ' + err);
@@ -110,6 +111,7 @@ var WebDriverInstance = function (baseBrowserDecorator, args, logger) {
     self._process = {
       kill: function() {
         interval && clearInterval(interval);
+        log.info('Killing ' + spec.testName + ' with sessionID ' + self.driver.getSessionID());
         self.driver.quit(function() {
           log.info('Killed ' + spec.testName + '.');
           self._onProcessExit(self.error ? -1 : 0, self.error);
